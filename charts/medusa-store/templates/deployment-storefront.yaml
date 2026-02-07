@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-storefront
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: storefront
+    release: {{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: storefront
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: storefront
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: storefront
+          image: medusajs/storefront:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: NEXT_PUBLIC_MEDUSA_BACKEND_URL
+              value: "http://{{ .Release.Name }}-medusa:9000"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 512Mi

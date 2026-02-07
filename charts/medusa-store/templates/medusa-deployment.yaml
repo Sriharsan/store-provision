@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medusa-api
+  namespace: {{ printf "store-%s" .Values.store.id }}
+spec:
+  replicas: {{ .Values.medusa.replicas }}
+  selector:
+    matchLabels:
+      app: medusa-api
+  template:
+    metadata:
+      labels:
+        app: medusa-api
+    spec:
+      securityContext:
+        {{- if .Values.security.runAsNonRoot }}
+        runAsNonRoot: {{ .Values.security.runAsNonRoot }}
+        runAsUser: {{ .Values.security.runAsUser }}
+        fsGroup: {{ .Values.security.fsGroup }}
+        {{- end }}
+      containers:
+      - name: medusa
+        image: {{ .Values.medusa.image.repository }}:{{ .Values.medusa.image.tag }}
+        imagePullPolicy: {{ .Values.medusa.image.pullPolicy }}
+        ports:
+        - containerPort: 9000
+          name: http
+        env:
+        {{- range .Values.medusa.env }}
+        - name: {{ .name }}
+          {{- if .value }}
+          value: {{ .value }}
+          {{- end }}
+          {{- if .valueFrom }}
+          valueFrom:
+            {{- toYaml .valueFrom | nindent 12 }}
+          {{- end }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.medusa.resources | nindent 10 }}
+        {{- if .Values.healthCheck.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.healthCheck.path }}
+            port: http
+          initialDelaySeconds: {{ .Values.healthCheck.initialDelaySeconds }}
+          periodSeconds: {{ .Values.healthCheck.periodSeconds }}
+          timeoutSeconds: {{ .Values.healthCheck.timeoutSeconds }}
+          failureThreshold: {{ .Values.healthCheck.failureThreshold }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.healthCheck.path }}
+            port: http
+          initialDelaySeconds: {{ .Values.healthCheck.initialDelaySeconds }}
+          periodSeconds: {{ .Values.healthCheck.periodSeconds }}
+          timeoutSeconds: {{ .Values.healthCheck.timeoutSeconds }}
+          failureThreshold: {{ .Values.healthCheck.failureThreshold }}
+        {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: medusa-api
+  namespace: {{ printf "store-%s" .Values.store.id }}
+spec:
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: medusa-api

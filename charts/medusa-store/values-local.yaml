@@ -1,0 +1,8 @@
+ingress:
+  host: "{{ .Values.store.id }}.localhost.nip.io"
+
+postgres:
+  storageClass: local-path
+
+secrets:
+  createFromEnv: true

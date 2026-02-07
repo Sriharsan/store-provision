@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-medusa
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: medusa
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: medusa
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: medusa
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: medusa
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 9000
+              protocol: TCP
+          env:
+            - name: DATABASE_URL
+              value: "postgres://postgres:postgres@postgres:5432/medusa"
+            - name: NODE_ENV
+              value: development
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

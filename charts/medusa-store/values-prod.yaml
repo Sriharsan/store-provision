@@ -1,0 +1,19 @@
+# Production overrides for VPS (e.g. k3s)
+ingress:
+  host: "store.yourdomain.com"
+  className: "traefik" # Common in k3s
+  tls:
+    enabled: true
+    secretName: "store-tls"
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+postgres:
+  storageClass: "local-path" # or 'longhorn' or 'gp2' depending on VPS
+  storage: 10Gi

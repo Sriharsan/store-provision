@@ -1,0 +1,14 @@
+# Local development values
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  host: "platform.localhost.nip.io"
+
+api:
+  replicas: 1
+
+dashboard:
+  replicas: 1

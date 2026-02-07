@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Store {
+  id            String   @id @default(uuid())
+  engine        String   @default("medusa") // medusa, woo
+  template      String   @default("starter")
+  status        String   // REQUESTED, PROVISIONING, READY, FAILED, DELETING, DELETED
+  url           String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  errorMessage  String?
+  cpu           String   @default("500m")
+  memory        String   @default("512Mi")
+  storage       String   @default("5Gi")
+
+  events        StoreEvent[]
+
+  @@map("stores")
+}
+
+model StoreEvent {
+  id        Int      @id @default(autoincrement())
+  storeId   String
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  action    String   // created, provisioning, ready, failed, deleting, deleted
+  status    String
+  message   String?
+  timestamp DateTime @default(now())
+  metadata  Json?
+
+  @@map("store_events")
+}
