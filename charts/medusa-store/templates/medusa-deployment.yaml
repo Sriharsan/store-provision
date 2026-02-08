@@ -24,7 +24,7 @@ spec:
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
-        - containerPort: 9000
+        - containerPort: 3001
           name: http
         env:
         {{- range .Values.env }}

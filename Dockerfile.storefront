@@ -1,0 +1,13 @@
+FROM node:18
+
+WORKDIR /app
+
+RUN npm install -g serve
+
+# simple test frontend (replace later with real storefront)
+RUN mkdir build
+RUN echo "<h1>Storefront Ready</h1>" > build/index.html
+
+EXPOSE 8000
+
+CMD ["serve", "-s", "build", "-l", "8000"]

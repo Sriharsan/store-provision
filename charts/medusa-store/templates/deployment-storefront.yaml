@@ -25,9 +25,8 @@ spec:
       containers:
         - name: storefront
 
-          # ✅ FIXED IMAGE (Docker Hub version DOES NOT EXIST)
-          image: ghcr.io/medusajs/nextjs-starter-medusa:latest
-          imagePullPolicy: Always
+          image: medusa-storefront:latest
+          imagePullPolicy: Never
 
           ports:
             - containerPort: 8000

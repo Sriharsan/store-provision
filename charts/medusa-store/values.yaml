@@ -11,8 +11,9 @@ image:
 
 storefront:
   image:
-    repository: ghcr.io/medusajs/nextjs-starter-medusa
+    repository: medusa-storefront
     tag: latest
+    pullPolicy: Never
 
 service:
   type: ClusterIP
