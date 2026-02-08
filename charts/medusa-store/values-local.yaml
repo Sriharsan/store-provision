@@ -1,8 +1,10 @@
-ingress:
-  host: "{{ .Values.store.id }}.localhost.nip.io"
-
-postgres:
-  storageClass: local-path
+postgresql:
+  auth:
+    username: postgres
+    password: password
+    database: medusa
+  storage:
+    storageClass: local-path
 
 secrets:
   createFromEnv: true

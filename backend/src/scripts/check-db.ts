@@ -1,11 +1,11 @@
-import prisma from './prisma';
+import prisma from "../prisma";
 
 async function main() {
     try {
         await prisma.$connect();
-        console.log('✅ Database connected successfully');
+        console.log("✅ Database connected successfully");
     } catch (error) {
-        console.error('❌ Database connection failed:', error);
+        console.error("❌ Database connection failed:", error);
         process.exit(1);
     }
 }

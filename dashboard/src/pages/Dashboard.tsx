@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, ExternalLink, RefreshCw, Trash2, ArrowRight } from 'lucide-react';
+import { Plus, ExternalLink, RefreshCw } from 'lucide-react';
 import { getStores } from '../api';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Button } from '../components/Button';
@@ -62,7 +62,7 @@ const Dashboard = () => {
                     ) : (
                         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {stores.map((store: any) => (
-                                <div key={store.id} className="group relative flex flex-col justify-between overflow-hidden rounded-xl border border-slate-700 bg-slate-800/50 p-6 hover:border-blue-500/50 transition-colors">
+                                <div key={store.id} className={`group relative flex flex-col justify-between overflow-hidden rounded-xl border border-slate-700 bg-slate-800/50 p-6 transition-colors ${store.status === 'DELETED' ? 'opacity-60 grayscale' : 'hover:border-blue-500/50'}`}>
                                     <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 transition-opacity group-hover:opacity-100" />
 
                                     <div className="relative z-10">
@@ -90,6 +90,11 @@ const Dashboard = () => {
                                                 <span className="text-slate-500">Created</span>
                                                 <span className="text-slate-300">{new Date(store.createdAt).toLocaleDateString()}</span>
                                             </div>
+                                            {store.status === 'FAILED' && store.errorMessage && (
+                                                <div className="mt-2 rounded bg-red-500/10 p-2 text-xs text-red-400 border border-red-500/20">
+                                                    Error: {store.errorMessage}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 

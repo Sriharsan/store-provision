@@ -5,7 +5,6 @@ import { ChevronLeft, Zap, Box, Layers } from 'lucide-react';
 import { createStore } from '../api';
 import { Button } from '../components/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
-import { Input } from '../components/Input';
 import { Link } from 'react-router-dom';
 
 const CreateStore = () => {
@@ -43,7 +42,6 @@ const CreateStore = () => {
                     </CardHeader>
                     <CardContent className="space-y-8">
 
-                        {/* Engine Selection */}
                         <div className="space-y-4">
                             <label className="text-sm font-medium text-slate-300">E-Commerce Engine</label>
                             <div className="grid grid-cols-2 gap-4">
@@ -59,16 +57,27 @@ const CreateStore = () => {
                                 </div>
 
                                 <div
-                                    onClick={() => setEngine('woo')} // Placeholder for now
-                                    className={`cursor-pointer rounded-xl border p-4 transition-all opacity-50 cursor-not-allowed border-slate-700 bg-slate-800`}
+                                    onClick={() => setEngine('woo')}
+                                    className={`cursor-pointer rounded-xl border p-4 transition-all ${engine === 'woo' ? 'border-purple-500 bg-purple-500/10 ring-1 ring-purple-500' : 'border-slate-700 bg-slate-800 hover:border-slate-500'}`}
                                 >
                                     <div className="flex items-center space-x-3 mb-2">
-                                        <Box className="h-5 w-5 text-slate-400" />
+                                        <Box className={`h-5 w-5 ${engine === 'woo' ? 'text-purple-500' : 'text-slate-400'}`} />
                                         <span className="font-semibold text-white">WooCommerce</span>
                                     </div>
-                                    <p className="text-xs text-slate-400">Coming soon.</p>
+                                    <p className="text-xs text-slate-400">Traditional, plugin-based commerce platform.</p>
                                 </div>
                             </div>
+
+                            {engine === 'woo' && (
+                                <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/10 p-4 text-sm text-yellow-200">
+                                    <div className="flex items-center font-semibold mb-1">
+                                        <span className="mr-2">🚧</span> WooCommerce provisioning is not available yet
+                                    </div>
+                                    <p className="opacity-90">
+                                        Medusa is fully supported in this version. Your store architecture already supports multiple engines, and WooCommerce integration is planned for the next release.
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Template Selection */}
@@ -94,8 +103,8 @@ const CreateStore = () => {
                         </div>
 
                         <div className="pt-4">
-                            <Button type="submit" size="lg" className="w-full" disabled={mutation.isPending}>
-                                {mutation.isPending ? 'Requesting Provisioning...' : 'Create Store'}
+                            <Button type="submit" size="lg" className="w-full" disabled={mutation.isPending || engine === 'woo'}>
+                                {engine === 'woo' ? 'Select Medusa to Continue' : mutation.isPending ? 'Requesting Provisioning...' : 'Create Store'}
                             </Button>
                         </div>
 

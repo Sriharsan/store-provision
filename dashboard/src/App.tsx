@@ -4,6 +4,7 @@ import Layout from './layout/Layout';
 import Dashboard from './pages/Dashboard';
 import CreateStore from './pages/CreateStore';
 import StoreDetail from './pages/StoreDetail';
+import Settings from './pages/Settings';
 
 const queryClient = new QueryClient();
 
@@ -16,6 +17,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="create" element={<CreateStore />} />
             <Route path="stores/:id" element={<StoreDetail />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
         </Routes>
       </BrowserRouter>

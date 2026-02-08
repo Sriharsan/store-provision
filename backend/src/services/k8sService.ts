@@ -28,8 +28,15 @@ export class K8sService {
      * Delete a namespace
      */
     async deleteNamespace(namespace: string): Promise<void> {
-        if (!(await this.namespaceExists(namespace))) return;
-        await execAsync(`kubectl delete namespace ${namespace} --wait=false`);
+        try {
+            await execAsync(`kubectl delete namespace ${namespace} --wait=false`);
+        } catch (error: any) {
+            // Ignore if already deleted
+            if (error.stderr && error.stderr.includes('NotFound')) return;
+            // Also check message just in case
+            if (error.message && error.message.includes('NotFound')) return;
+            throw error;
+        }
     }
 
     /**
@@ -55,8 +62,16 @@ export class K8sService {
         // We strictly use the local values for now
         const chartPath = '../charts/medusa-store';
 
+        // Ensure namespace exists before installing
+        const nsExists = await this.namespaceExists(namespace);
+        if (!nsExists) {
+            console.log(`Creating namespace ${namespace}...`);
+            await this.createNamespace(namespace);
+        }
+
         // Construct --set arguments from values object if needed, but for now we rely on values-local.yaml
-        const cmd = `helm upgrade --install ${releaseName} ${chartPath} --namespace ${namespace} --create-namespace -f ${chartPath}/values-local.yaml --set store.id=${releaseName} --wait --timeout 5m`;
+        // Removed --create-namespace as we handle it explicitly above to avoid race conditions
+        const cmd = `helm upgrade --install ${releaseName} ${chartPath} --namespace ${namespace} --set store.id=${releaseName} --timeout 15m`;
 
         console.log(`Executing: ${cmd}`);
         await execAsync(cmd);
@@ -68,8 +83,9 @@ export class K8sService {
     async uninstallHelmChart(releaseName: string, namespace: string): Promise<void> {
         try {
             await execAsync(`helm uninstall ${releaseName} -n ${namespace}`);
-        } catch (e) {
+        } catch (e: any) {
             // Ignore if already gone
+            if (e.stderr && e.stderr.includes('not found')) return;
         }
     }
 

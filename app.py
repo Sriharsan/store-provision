@@ -114,6 +114,10 @@ def start_backend():
     print(f"   Port: 4000")
     print(f"   URL: http://localhost:4000")
     print()
+
+    # Ensure Prisma Client is generated
+    print("   Generating Prisma Client...")
+    subprocess.run([get_npm_command(), "run", "prisma:generate"], cwd=BACKEND_DIR, check=False)
     
     backend_process = subprocess.Popen(
         [get_npm_command(), "run", "dev"],
@@ -121,6 +125,7 @@ def start_backend():
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
+        encoding='utf-8',
         bufsize=1
     )
     
@@ -137,8 +142,8 @@ def start_dashboard():
     
     print("🚀 Starting dashboard...")
     print(f"   Directory: {DASHBOARD_DIR}")
-    print(f"   Port: 3000")
-    print(f"   URL: http://localhost:3000")
+    print(f"   Port: 8082")
+    print(f"   URL: http://localhost:8082")
     print()
     
     dashboard_process = subprocess.Popen(
@@ -147,6 +152,7 @@ def start_dashboard():
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
+        encoding='utf-8',
         bufsize=1
     )
     
@@ -211,7 +217,7 @@ def main():
     print("✅ Both services are starting...")
     print("=" * 60)
     print()
-    print("📍 Access the dashboard at: http://localhost:3000")
+    print("📍 Access the dashboard at: http://localhost:8082")
     print("📍 API endpoint: http://localhost:4000")
     print("📍 Health check: http://localhost:4000/health")
     print()

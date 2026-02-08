@@ -1,5 +1,6 @@
 import prisma from '../prisma';
 import { k8sService } from '../services/k8sService';
+import axios from 'axios';
 
 const LOOP_INTERVAL_MS = 5000;
 
@@ -46,8 +47,13 @@ export class ReconciliationEngine {
                     await this.handleDeleting(store, namespace);
                 }
             } catch (error: any) {
-                console.error(`❌ Error processing store ${store.id}:`, error);
-                await this.logEvent(store.id, 'failed', 'FAILED', error.message || 'Unknown error');
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                console.error(`❌ Error processing store ${store.id}:`, errorMessage);
+                if (error?.response?.body) {
+                    console.error('   K8s API Error Body:', JSON.stringify(error.response.body, null, 2));
+                }
+
+                await this.logEvent(store.id, 'failed', 'FAILED', errorMessage);
                 await prisma.store.update({
                     where: { id: store.id },
                     data: { status: 'FAILED', errorMessage: error.message }
@@ -76,34 +82,74 @@ export class ReconciliationEngine {
         await this.logEvent(store.id, 'provisioning', 'PROVISIONING', 'Helm release installed, waiting for pods');
     }
 
+
     private async handleProvisioning(store: any, namespace: string) {
-        // Check if ready
-        const ready = await k8sService.checkPodsReady(namespace);
+        // 1. Check for Timeout (15 minutes)
+        const timeoutLimit = 15 * 60 * 1000;
+        const elapsed = Date.now() - new Date(store.createdAt).getTime();
 
-        if (ready) {
-            console.log(`✅ Store ${store.id} is READY`);
+        if (elapsed > timeoutLimit) {
+            console.error(`❌ Store ${store.id} timed out during provisioning`);
+            await this.handleFailure(store, 'Provisioning timed out after 15 minutes. Infrastructure readiness check failed.');
+            return;
+        }
 
-            const host = await k8sService.getIngressHost(namespace);
-            const url = host ? `http://${host}` : null;
+        // 2. Check Pod Readiness
+        const podsReady = await k8sService.checkPodsReady(namespace);
+        if (!podsReady) return; // Wait for next loop
+
+        // 3. Check Ingress/Storefront Availability (Hard Ready Contract)
+        const host = await k8sService.getIngressHost(namespace);
+        const url = host ? `http://${host}` : null;
+
+        if (!url) return; // Wait for Ingress to be assigned
+
+        try {
+            // Check Storefront Health (assuming root returns 200)
+            // We can also check /health if Medusa exposes it on the ingress, but usually / works for storefront
+            await axios.get(url, { timeout: 2000 });
+            console.log(`✅ Store ${store.id} is READY (Pods + HTTP 200)`);
 
             await prisma.store.update({
                 where: { id: store.id },
                 data: { status: 'READY', url: url }
             });
 
-            await this.logEvent(store.id, 'ready', 'READY', `Store is ready at ${url}`);
-        } else {
-            // Still initializing, maybe check for timeout here?
-            // For now, just wait for next loop
+            await this.logEvent(store.id, 'ready', 'READY', `Store is fully ready at ${url}`);
+        } catch (error) {
+            console.log(`⏳ Store ${store.id} pods ready, but expecting HTTP 200 from ${url}...`);
+            // Do not fail yet, just wait for traffic to flow
         }
+    }
+
+    private async handleFailure(store: any, reason: string) {
+        await this.logEvent(store.id, 'failed', 'FAILED', reason);
+        await prisma.store.update({
+            where: { id: store.id },
+            data: { status: 'FAILED', errorMessage: reason }
+        });
     }
 
     private async handleDeleting(store: any, namespace: string) {
         console.log(`🗑️ Deleting store ${store.id}`);
 
+        // 1. Ensure deletion is triggered (Idempotent)
+        // We use --wait=false so this returns immediately
         await k8sService.uninstallHelmChart(`medusa-${store.id}`, namespace);
         await k8sService.deleteNamespace(namespace);
 
+        // 2. Check if namespace still exists
+        const exists = await k8sService.namespaceExists(namespace);
+
+        if (exists) {
+            console.log(`⏳ Namespace ${namespace} still terminating...`);
+            // Do NOT update status to DELETED yet.
+            // Return and let the next loop check again.
+            return;
+        }
+
+        // 3. Namespace is gone -> Update DB
+        console.log(`✅ Namespace ${namespace} deleted. Updating DB.`);
         await prisma.store.update({
             where: { id: store.id },
             data: { status: 'DELETED' }

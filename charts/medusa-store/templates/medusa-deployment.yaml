@@ -2,9 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: medusa-api
-  namespace: {{ printf "store-%s" .Values.store.id }}
+
 spec:
-  replicas: {{ .Values.medusa.replicas }}
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: medusa-api
@@ -21,13 +21,13 @@ spec:
         {{- end }}
       containers:
       - name: medusa
-        image: {{ .Values.medusa.image.repository }}:{{ .Values.medusa.image.tag }}
-        imagePullPolicy: {{ .Values.medusa.image.pullPolicy }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: 9000
           name: http
         env:
-        {{- range .Values.medusa.env }}
+        {{- range .Values.env }}
         - name: {{ .name }}
           {{- if .value }}
           value: {{ .value }}
@@ -38,7 +38,7 @@ spec:
           {{- end }}
         {{- end }}
         resources:
-          {{- toYaml .Values.medusa.resources | nindent 10 }}
+          {{- toYaml .Values.resources | nindent 10 }}
         {{- if .Values.healthCheck.enabled }}
         livenessProbe:
           httpGet:
@@ -62,7 +62,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: medusa-api
-  namespace: {{ printf "store-%s" .Values.store.id }}
+
 spec:
   ports:
   - port: 80

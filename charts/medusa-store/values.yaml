@@ -2,12 +2,17 @@ store:
   id: ""
   engine: medusa
 
-image:
-  repository: medusajs/medusa
-  tag: latest
-  pullPolicy: IfNotPresent
-
 replicaCount: 1
+
+image:
+  repository: medusa-api
+  tag: latest
+  pullPolicy: Never
+
+storefront:
+  image:
+    repository: ghcr.io/medusajs/nextjs-starter-medusa
+    tag: latest
 
 service:
   type: ClusterIP
@@ -15,7 +20,7 @@ service:
 
 ingress:
   enabled: true
-  className: "nginx"
+  className: nginx
   annotations: {}
   hosts:
     - host: chart-example.local
@@ -25,12 +30,44 @@ ingress:
 
 resources:
   limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
     cpu: 500m
     memory: 512Mi
-  requests:
-    cpu: 250m
-    memory: 256Mi
 
-postgres:
+env:
+  - name: DATABASE_URL
+    valueFrom:
+      secretKeyRef:
+        name: medusa-secrets
+        key: database-url
+
+  # Redis disabled → Medusa works without it
+  - name: REDIS_URL
+    value: ""
+
+healthCheck:
   enabled: true
-  storage: 5Gi
+  path: /health
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+security:
+  runAsNonRoot: false
+  runAsUser: 999
+  fsGroup: 999
+
+postgresql:
+  enabled: true
+  image:
+    repository: postgres
+    tag: 15-alpine
+  auth:
+    username: postgres
+    password: postgres
+    database: medusa
+  storage:
+    size: 5Gi
