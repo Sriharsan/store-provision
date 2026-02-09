@@ -11,7 +11,8 @@ spec:
   ingressClassName: {{ .Values.ingress.className }}
 
   rules:
-    - host: {{ printf "%s.myapp.local" .Values.store.id }}
+    - host: {{ printf "%s.localtest.me" .Values.store.id }}
+
       http:
         paths:
 
