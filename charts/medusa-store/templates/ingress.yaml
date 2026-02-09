@@ -6,12 +6,15 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     {{- toYaml .Values.ingress.annotations | nindent 4 }}
+
 spec:
   ingressClassName: {{ .Values.ingress.className }}
+
   rules:
-    - host: {{ .Values.ingress.host | default (printf "%s.localhost.nip.io" .Values.store.id) }}
+    - host: {{ printf "%s.myapp.local" .Values.store.id }}
       http:
         paths:
+
           - path: /api
             pathType: Prefix
             backend:
@@ -19,6 +22,7 @@ spec:
                 name: medusa-api
                 port:
                   number: 80
+
           - path: /
             pathType: Prefix
             backend:
