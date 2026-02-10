@@ -26,6 +26,13 @@ spec:
               echo "🚀 Running Prisma migrations..."
               npx prisma migrate deploy
 
+              echo "🌱 Seeding data..."
+              if [ -f "./data/seed.json" ]; then
+                npx medusa seed -f ./data/seed.json
+              else
+                echo "⚠️ No seed file found, skipping seed."
+              fi
+
               echo "✅ Seed step completed"
           env:
             - name: DATABASE_URL

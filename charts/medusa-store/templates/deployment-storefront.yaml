@@ -5,56 +5,19 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     app: storefront
-    release: {{ .Release.Name }}
-
 spec:
   replicas: 1
-
   selector:
     matchLabels:
       app: storefront
-      release: {{ .Release.Name }}
-
   template:
     metadata:
       labels:
         app: storefront
-        release: {{ .Release.Name }}
-
     spec:
       containers:
         - name: storefront
-
-          image: medusa-storefront:latest
-          imagePullPolicy: Never
-
+          image: storepro-storefront:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
-
-          env:
-            # ✅ Use service name (cluster DNS)
-            - name: NEXT_PUBLIC_MEDUSA_BACKEND_URL
-              value: "http://{{ .Release.Name }}-medusa-api:9000"
-
-          resources:
-            requests:
-              cpu: 100m
-              memory: 128Mi
-            limits:
-              cpu: 300m
-              memory: 512Mi
-
-          # ✅ VERY IMPORTANT (Helm waits for READY pods)
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 8000
-            initialDelaySeconds: 10
-            periodSeconds: 5
-
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 8000
-            initialDelaySeconds: 30
-            periodSeconds: 10

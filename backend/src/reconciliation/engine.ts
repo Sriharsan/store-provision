@@ -34,7 +34,7 @@ export class ReconciliationEngine {
             }
         });
 
-        for (const store of stores) {
+        await Promise.all(stores.map(async (store) => {
             const namespace = `store-${store.id}`;
 
             try {
@@ -61,7 +61,7 @@ export class ReconciliationEngine {
                     }
                 });
             }
-        }
+        }));
     }
 
     private async handleRequested(store: any, namespace: string) {

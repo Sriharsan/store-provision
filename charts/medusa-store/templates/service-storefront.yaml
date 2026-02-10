@@ -3,16 +3,10 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-storefront
   namespace: {{ .Release.Namespace }}
-  labels:
-    app: storefront
-    release: {{ .Release.Name }}
 spec:
   type: ClusterIP
+  selector:
+    app: storefront
   ports:
     - port: 8000
       targetPort: 8000
-      protocol: TCP
-      name: http
-  selector:
-    app: storefront
-    release: {{ .Release.Name }}
