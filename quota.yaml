@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: medusa-3121726f-875a-4db0-b8bc-38899b8f255e-quota
+  namespace: store-3121726f-875a-4db0-b8bc-38899b8f255e
+spec:
+  hard:
+    pods: "30"
+    requests.cpu: "2"
+    requests.memory: 2Gi
+    limits.memory: 4Gi

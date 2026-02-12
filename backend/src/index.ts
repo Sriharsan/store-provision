@@ -2,41 +2,72 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
-import { createStore, getStores, getStoreById, deleteStore } from './controllers/storeController';
+
+import {
+  createStore,
+  getStores,
+  getStoreById,
+  deleteStore
+} from './controllers/storeController';
+
 import { reconciliationEngine } from './reconciliation/engine';
 import prisma from './prisma';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 
+// 🚨 Avoid Windows reserved ports
+const PORT = Number(process.env.PORT) || 12000;
+
+// =========================
 // Middleware
+// =========================
+
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
+// =========================
 // Routes
+// =========================
+
 app.post('/stores', createStore);
 app.get('/stores', getStores);
 app.get('/stores/:id', getStoreById);
 app.delete('/stores/:id', deleteStore);
 
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// =========================
+// Server Startup
+// =========================
 
-  // Start Reconciliation Loop
+const server = app.listen(PORT, () => {
+  console.log('====================================');
+  console.log(`🚀 API Server running on port ${PORT}`);
+  console.log(`🌐 http://localhost:${PORT}`);
+  console.log('====================================');
+
   reconciliationEngine.start();
 });
 
+// =========================
 // Graceful Shutdown
-process.on('SIGTERM', async () => {
-  console.log('SIGTERM signal received: closing HTTP server');
+// =========================
+
+const shutdown = async () => {
+  console.log('🛑 Graceful shutdown initiated...');
+
   await prisma.$disconnect();
-  process.exit(0);
-});
+
+  server.close(() => {
+    console.log('✅ Server closed');
+    process.exit(0);
+  });
+};
+
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);

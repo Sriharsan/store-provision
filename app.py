@@ -111,8 +111,8 @@ def start_backend():
     
     print("🚀 Starting backend API...")
     print(f"   Directory: {BACKEND_DIR}")
-    print(f"   Port: 4000")
-    print(f"   URL: http://localhost:4000")
+    print(f"   Port: 12000")
+    print(f"   URL: http://localhost:12000")
     print()
 
     # Ensure Prisma Client is generated
@@ -218,8 +218,8 @@ def main():
     print("=" * 60)
     print()
     print("📍 Access the dashboard at: http://localhost:8082")
-    print("📍 API endpoint: http://localhost:4000")
-    print("📍 Health check: http://localhost:4000/health")
+    print("📍 API endpoint: http://localhost:12000")
+    print("📍 Health check: http://localhost:12000/health")
     print()
     print("Press Ctrl+C to stop all services")
     print("=" * 60)

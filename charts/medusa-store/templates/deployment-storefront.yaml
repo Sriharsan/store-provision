@@ -20,4 +20,4 @@ spec:
           image: storepro-storefront:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8000
+            - containerPort: 3000

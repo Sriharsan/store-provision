@@ -14,29 +14,6 @@ spec:
       containers:
         - name: seed
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: Never
-          command: ["/bin/sh", "-c"]
+          command: ["/bin/sh","-c"]
           args:
-            - |
-              echo "⏳ Waiting for Postgres..."
-              until pg_isready -h postgres -U {{ .Values.postgresql.auth.username }}; do
-                sleep 2
-              done
-
-              echo "🚀 Running Prisma migrations..."
-              npx prisma migrate deploy
-
-              echo "🌱 Seeding data..."
-              if [ -f "./data/seed.json" ]; then
-                npx medusa seed -f ./data/seed.json
-              else
-                echo "⚠️ No seed file found, skipping seed."
-              fi
-
-              echo "✅ Seed step completed"
-          env:
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: medusa-secrets
-                  key: database-url
+            - echo "Seed skipped (clean install)"

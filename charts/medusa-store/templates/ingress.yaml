@@ -3,23 +3,30 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}-medusa
   namespace: {{ .Release.Namespace }}
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+
 spec:
   ingressClassName: nginx
+
   rules:
-    - host: {{ printf "%s.localtest.me" .Release.Name }}
+    - host: {{ printf "%s.127.0.0.1.nip.io" .Release.Name }}
       http:
         paths:
-          - path: /api
-            pathType: Prefix
+
+          - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
-                name: medusa-api
+                name: {{ .Release.Name }}-medusa-api
                 port:
                   number: 80
+
           - path: /
             pathType: Prefix
             backend:
               service:
                 name: {{ .Release.Name }}-storefront
                 port:
-                  number: 8000
+                  number: 3000

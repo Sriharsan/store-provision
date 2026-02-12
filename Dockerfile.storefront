@@ -1,13 +1,14 @@
-FROM node:18
+FROM node:20
 
 WORKDIR /app
 
-RUN npm install -g serve
+COPY storefront/package*.json ./
+RUN npm install
 
-# simple test frontend (replace later with real storefront)
-RUN mkdir build
-RUN echo "<h1>Storefront Ready</h1>" > build/index.html
+COPY storefront .
 
-EXPOSE 8000
+RUN npm run build
 
-CMD ["serve", "-s", "build", "-l", "8000"]
+EXPOSE 3000
+
+CMD ["npm","start"]
