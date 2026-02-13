@@ -44,7 +44,7 @@ fi
 
 echo
 echo "============================================================"
-echo "Starting Backend API (Port 3001)..."
+echo "Starting Backend API (Port 12000)..."
 echo "============================================================"
 cd backend
 npm run dev &
@@ -56,7 +56,7 @@ sleep 3
 
 echo
 echo "============================================================"
-echo "Starting Dashboard (Port 3000)..."
+echo "Starting Dashboard (Port 8082)..."
 echo "============================================================"
 cd dashboard
 npm run dev &
@@ -68,8 +68,8 @@ echo "============================================================"
 echo "Both services are starting..."
 echo "============================================================"
 echo
-echo "Access the dashboard at: http://localhost:3000"
-echo "API endpoint: http://localhost:3001"
+echo "Access the dashboard at: http://localhost:8082"
+echo "API endpoint: http://localhost:12000"
 echo
 echo "Press Ctrl+C to stop all services"
 echo "============================================================"

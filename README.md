@@ -36,19 +36,19 @@ We provide a script to setup the database, backend, and dashboard automatically.
     python app.py
     ```
 
-3.  **Access Dashboard**: [http://localhost:3000](http://localhost:3000)
+3.  **Access Dashboard**: [http://localhost:8082](http://localhost:8082)
 
 ### 2. Manual Start (Alternative)
 If you prefer running services individually:
 
-**Backend (Port 3001)**:
+**Backend (Port 12000)**:
 ```bash
 cd backend
 npm install
 npm run dev
 ```
 
-**Dashboard (Port 3000)**:
+**Dashboard (Port 8082)**:
 ```bash
 cd dashboard
 npm install

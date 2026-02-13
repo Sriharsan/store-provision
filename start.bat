@@ -47,7 +47,7 @@ if not exist "dashboard\node_modules" (
 
 echo.
 echo ============================================================
-echo Starting Backend API (Port 3001)...
+echo Starting Backend API (Port 12000)...
 echo ============================================================
 start "Backend API" cmd /k "cd backend && npm run dev"
 
@@ -56,7 +56,7 @@ timeout /t 3 /nobreak >nul
 
 echo.
 echo ============================================================
-echo Starting Dashboard (Port 3000)...
+echo Starting Dashboard (Port 8082)...
 echo ============================================================
 start "Dashboard" cmd /k "cd dashboard && npm run dev"
 
@@ -65,8 +65,8 @@ echo ============================================================
 echo Both services are starting in separate windows
 echo ============================================================
 echo.
-echo Access the dashboard at: http://localhost:3000
-echo API endpoint: http://localhost:3001
+echo Access the dashboard at: http://localhost:8082
+echo API endpoint: http://localhost:12000
 echo.
 echo Close the windows or press Ctrl+C in each window to stop
 echo ============================================================

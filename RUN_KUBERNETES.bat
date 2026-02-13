@@ -58,8 +58,8 @@ echo ========================================
 echo Setup complete!
 echo.
 echo To access dashboard, run in a new terminal:
-echo   kubectl port-forward -n platform svc/platform-dashboard 3000:80
+echo   kubectl port-forward -n platform svc/platform-dashboard 8082:80
 echo.
-echo Then open: http://localhost:3000
+echo Then open: http://localhost:8082
 echo ========================================
 pause

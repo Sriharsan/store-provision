@@ -3,9 +3,16 @@ dist/
 *.log
 .env
 .DS_Store
+Thumbs.db
 data/
 *.db
 *.db-journal
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+venv/
 
 # IDE
 .vscode/
@@ -19,3 +26,4 @@ data/
 # Build artifacts
 *.tgz
 charts/*/charts/
+
