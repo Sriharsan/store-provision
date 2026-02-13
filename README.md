@@ -1,4 +1,4 @@
-# Store Provisioning Platform (Urumi AI Round 1)
+# Store Provisioning Platform
 
 A Kubernetes-native platform for on-demand provisioning of **Medusa** e-commerce stores. Designed for **Local Development (Kind/k3d)** and **Production (VPS/k3s)** using the same Helm charts.
 
@@ -130,3 +130,4 @@ helm install platform ./charts/platform \
     - Check Ingress: `kubectl get ingress -n store-<id>`
 - **Database Connection Error**:
     - Ensure `backend/.env` points to your local Metadata DB (not the tenant DBs).
+
