@@ -81,7 +81,7 @@ spec:
       accessModes: ["ReadWriteOnce"]
       resources:
         requests:
-          storage: 5Gi
+          storage: {{ .Values.postgresql.persistence.size | default "5Gi" }}
 
 ---
 

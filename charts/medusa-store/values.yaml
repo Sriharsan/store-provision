@@ -5,9 +5,9 @@ store:
 replicaCount: 1
 
 image:
-  repository: ghcr.io/sriharsan/medusa-backend
-  tag: "1.4"
-  pullPolicy: IfNotPresent
+  repository: medusa-api
+  tag: latest
+  pullPolicy: Never
 
 storefront:
   image:
@@ -15,13 +15,23 @@ storefront:
     tag: latest
     pullPolicy: IfNotPresent
 
+# =============================
+# ENVIRONMENT VARIABLES
+# =============================
 env:
+  # Medusa database (inside cluster)
   - name: DATABASE_URL
     value: postgres://postgres:postgres@postgres:5432/medusa
+
   - name: NODE_ENV
     value: production
 
+  - name: NEXT_PUBLIC_MEDUSA_BACKEND_URL
+    value: "http://medusa-{{ .Values.store.id }}.127.0.0.1.nip.io"
+
 postgresql:
+  persistence:
+    size: 5Gi
   enabled: true
   image:
     repository: postgres
